@@ -6,7 +6,9 @@ A high-performance, interactive log viewing and analytics application built with
 
 - **Blazing Fast Queries:** Powered by DuckDB, enabling high-speed querying and parsing of raw `.json` and `.log` files without pre-indexing.
 - **Real-Time Monitoring:** Toggle between `Static` (historical analysis) and `Live` modes with customizable auto-refresh intervals.
-- **Advanced Filtering:** Drill down into your logs using Time Range, Log Levels, Search terms, and specific Log Name inclusions/exclusions.
+- **Advanced Filtering & Search:** Drill down into your logs using Time Range, Log Levels, Search terms, and specific Log Name inclusions/exclusions.
+  - *Smart Level Matching:* Automatically groups `WARN` and `WARNING` logs together for seamless querying regardless of the source format.
+- **Saved Views (Shareable URLs):** All filter states (Project, File, Search, Levels, etc.) are synchronized with URL query parameters. You can instantly share a link to a specific log view with your team!
 - **Interactive Analytics Dashboard:**
   - **Time Series Chart:** Track log volume over time, color-coded by log level (e.g., Red for ERROR, Green for INFO) using Plotly.
   - **Error Breakdown:** Identify problematic services instantly with a donut chart summarizing ERROR logs.
