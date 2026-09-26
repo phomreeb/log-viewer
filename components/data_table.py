@@ -22,7 +22,7 @@ def render_metrics_and_export(df: pd.DataFrame, selected_project: str):
 
 def render_log_table(df: pd.DataFrame) -> dict:
     """Render the main log dataframe and return selected rows."""
-    main_cols = [c for c in ['timestamp', 'source_log_file', 'level', 'service', 'name', 'message'] if c in df.columns]
+    main_cols = [c for c in ['timestamp', 'level', 'service', 'name', 'source_log_file', 'message'] if c in df.columns]
 
     event = st.dataframe(
         df[main_cols],

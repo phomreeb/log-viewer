@@ -70,16 +70,25 @@ def render_filters(available_names: list) -> Dict[str, Any]:
     st.sidebar.header("🔍 Filters")
     filters = {}
     
-    filters['search_term'] = st.sidebar.text_input("Search (Message/Payload)", value="")
+    filters['search_term'] = st.sidebar.text_input(
+        "Search (Message/Payload)", 
+        value="", 
+        key="filter_search_term"
+    )
+    
+    # Use session_state to set default only once, to avoid conflicts with 'key'
+    if 'filter_selected_levels' not in st.session_state:
+        st.session_state['filter_selected_levels'] = ["INFO", "WARNING", "ERROR"]
+
     filters['selected_levels'] = st.sidebar.multiselect(
         "Log Levels",
-        options=["INFO", "WARN", "ERROR", "DEBUG"],
-        default=["INFO", "WARN", "ERROR"]
+        options=["INFO", "WARNING", "ERROR", "DEBUG", "CRITICAL"],
+        key="filter_selected_levels"
     )
 
     st.sidebar.markdown("---")
     st.sidebar.subheader("⏱️ Time Range Filter")
-    enable_time_filter = st.sidebar.checkbox("Enable Time Filter", value=False)
+    enable_time_filter = st.sidebar.checkbox("Enable Time Filter", value=False, key="filter_enable_time")
 
     filters['start_datetime'] = None
     filters['end_datetime'] = None
@@ -89,13 +98,23 @@ def render_filters(available_names: list) -> Dict[str, Any]:
         today = datetime.date.today()
         yesterday = today - datetime.timedelta(days=1)
         
+        # Initialize default dates in session state if not present
+        if 'filter_start_date' not in st.session_state:
+            st.session_state['filter_start_date'] = yesterday
+        if 'filter_start_time' not in st.session_state:
+            st.session_state['filter_start_time'] = pd.to_datetime("00:00:00").time()
+        if 'filter_end_date' not in st.session_state:
+            st.session_state['filter_end_date'] = today
+        if 'filter_end_time' not in st.session_state:
+            st.session_state['filter_end_time'] = pd.to_datetime("23:59:59").time()
+
         col1, col2 = st.sidebar.columns(2)
         with col1:
-            start_date = st.date_input("Start Date", value=yesterday)
-            start_time = st.time_input("Start Time", value=pd.to_datetime("00:00:00").time())
+            start_date = st.date_input("Start Date", key="filter_start_date")
+            start_time = st.time_input("Start Time", key="filter_start_time")
         with col2:
-            end_date = st.date_input("End Date", value=today)
-            end_time = st.time_input("End Time", value=pd.to_datetime("23:59:59").time())
+            end_date = st.date_input("End Date", key="filter_end_date")
+            end_time = st.time_input("End Time", key="filter_end_time")
         
         filters['start_datetime'] = f"{start_date} {start_time}"
         filters['end_datetime'] = f"{end_date} {end_time}"
@@ -107,9 +126,20 @@ def render_filters(available_names: list) -> Dict[str, Any]:
     filters['selected_exclude_names'] = []
 
     if available_names:
+        # Sort available names so the options list is strictly stable
+        stable_names = sorted(available_names)
+        
         st.sidebar.markdown("---")
         st.sidebar.subheader("📌 Log Name Filters")
-        filters['selected_include_names'] = st.sidebar.multiselect("Include Names (เลือกเฉพาะ)", options=available_names)
-        filters['selected_exclude_names'] = st.sidebar.multiselect("Exclude Names (ยกเว้น)", options=available_names)
+        filters['selected_include_names'] = st.sidebar.multiselect(
+            "Include Names (เลือกเฉพาะ)", 
+            options=stable_names, 
+            key="filter_include_names"
+        )
+        filters['selected_exclude_names'] = st.sidebar.multiselect(
+            "Exclude Names (ยกเว้น)", 
+            options=stable_names, 
+            key="filter_exclude_names"
+        )
 
     return filters

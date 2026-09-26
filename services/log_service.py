@@ -24,9 +24,21 @@ class LogService:
         params = []
 
         if levels and "level" in columns:
-            placeholders = ", ".join(["?"] * len(levels))
+            processed_levels = []
+            for l in levels:
+                upper_l = l.upper()
+                processed_levels.append(upper_l)
+                if upper_l == 'WARN':
+                    processed_levels.append('WARNING')
+                elif upper_l == 'WARNING':
+                    processed_levels.append('WARN')
+            
+            # Remove duplicates just in case
+            processed_levels = list(set(processed_levels))
+            
+            placeholders = ", ".join(["?"] * len(processed_levels))
             query += f" AND UPPER(level) IN ({placeholders})"
-            params.extend([l.upper() for l in levels])
+            params.extend(processed_levels)
 
         if include_names and "name" in columns:
             placeholders = ", ".join(["?"] * len(include_names))
